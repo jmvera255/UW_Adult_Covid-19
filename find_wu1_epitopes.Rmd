@@ -1,0 +1,144 @@
+---
+title: "Wu1-SARS2 Epitopes"
+output: html_notebook
+---
+
+# Description
+
+This rmarkdown file takes the pepMeld output, calculates signficance on the sequence level using
+a two-sided t-test (COVID+ vs COVID-), and then finds epitopes based upon consecutive probes that have survived a significance and fold-change threshold.
+
+# Requirements
+
+## R Packages
+UW.Adult.Covid.19 - Part of this repository (use devtools::install("UW.Adult.Covid.19))
+
+Matrix - https://cran.r-project.org/web/packages/Matrix/index.html
+
+data.table - https://cran.r-project.org/web/packages/data.table/index.html
+
+multtest - https://www.bioconductor.org/packages/release/bioc/html/multtest.html
+
+preprocessCore - http://bioconductor.org/packages/release/bioc/html/preprocessCore.html
+
+Matrix and data.table are in the requirements of the UW.Adult.Covid.19 package and should be installed upon its installation, the Bioconductor packages can be installed manually using the instructions on the respective package's bioconductor webpage.
+
+## Data
+
+Data can be downloaded from: https://dholk.primate.wisc.edu/project/dho/sequencing/Polypeptide%20Microarrays/public/COVID_19/begin.view
+
+From the above site, this script uses:
+
+- aggregated_data/df_stacked.tsv.gz
+
+- all_sequences_except_wi.tsv.gz
+
+Please download these files and place them in the same directory as the script (or provide the paths in the variables below).
+
+The df_stacked.tsv.gz file can also be generated using pepMeld (http://https://github.com/DABAKER165/pepMeld).  Please read the documentation at https://dholk.primate.wisc.edu/project/dho/sequencing/Polypeptide%20Microarrays/public/COVID_19/begin.view
+
+
+## Output
+
+After successful completion of this script, the following files will be output:
+
+epitopes_wu1.csv - Epitopes detected and their probe boundaries with sequence information
+
+epitope_mat_wu1.csv - Average probe signal within each sample epitope.  Rows are protein_start_stop, where start is the first probe's with the protein starting position, and stop is the last probe's protein starting position.
+
+
+```{r}
+
+# Load library
+#devtools::install("~/git/github/Ong-Research/UW_Adult_Covid-19/UW.Adult.Covid.19")
+library(UW.Adult.Covid.19);
+
+```
+
+```{r}
+########################################
+# FUNCTIONS AND PROCEDURES
+########################################
+
+```
+``` {r}
+##############################
+# BEGIN OF SCRIPTING
+##############################
+```
+```{r, parameters}
+stacked_df_path = "df_stacked.tsv";
+probe_meta_path = "all_sequences_except_wi.tsv.gz";
+
+padj_threshold = 0.1;
+lfc_threshold = 1;
+```
+```{r, sequence_matrix}
+seq_mat = loadSeqMat(file_name = stacked_df_path);
+```
+```{r, sample_meta}
+sample_meta = attr(seq_mat, "sample_meta");
+```
+```{r, probe_meta}
+probe_meta = loadProbeMeta(probe_meta_path);
+probe_meta = probe_meta[probe_meta$PROBE_SEQUENCE %in% rownames(seq_mat),];
+```
+```{r, quantile_normalize}
+seq_mat_qn = UW.Adult.Covid.19::normalizeQuantile(seq_mat[,-1]);
+```
+```{r, ttest_covid_vs_control}
+seq_mat_qn_covid_vs_control_ttest = UW.Adult.Covid.19::doTTest(
+  seq_mat_qn,
+  sample_meta$SAMPLE_NAME[sample_meta$COVID_POSITIVE == "NO"],
+  sample_meta$SAMPLE_NAME[sample_meta$COVID_POSITIVE == "YES"],
+  var.equal = FALSE,
+  label.col = "row.names"
+)
+```
+```{r, probe}
+
+probe_mat_qn_covid_vs_control_ttest = 
+  as.data.frame(
+  UW.Adult.Covid.19::convertSequenceMatToProbeMat(
+  seq_mat = seq_mat_qn_covid_vs_control_ttest[seq_mat_qn_covid_vs_control_ttest$ID %in% probe_meta$PROBE_SEQUENCE,-1],
+  probe_meta = probe_meta
+)
+)
+
+```
+```{r, epitopes}
+epi = findEpitopesTTestProbe(probe_mat_qn_covid_vs_control_ttest, probe_meta, lfc.threshold = lfc_threshold, pvalue.threshold = padj_threshold);
+```
+
+```{r, epitopes_wu1}
+epi$Epitope_ID = getEpitopeID(epi$Protein, epi$Start, epi$Stop);
+epi_wu1 = epi[grep("Wu1", epi$Protein),]
+epi_wu1 = epi_wu1[grep("NC_045512.2;YP_009725295.1;Wu1-SARS2_orf1a", epi_wu1$Protein, invert=TRUE),];
+write.csv(epi_wu1, "epitopes_wu1.csv", row.names=TRUE);
+```
+
+```{r, probe_mat}
+probe_mat = convertSequenceMatToProbeMat(
+  seq_mat = seq_mat_qn[rownames(seq_mat_qn) %in% probe_meta$PROBE_SEQUENCE,],
+  probe_meta = probe_meta
+);
+
+```
+```{r}
+epitope_mat_wu1 = getEpitopeMat(probe_mat = probe_mat, epitopes_df = epi_wu1);
+write.csv(epitope_mat_wu1, "epitopes_mat_wu1.csv", row.names=TRUE);
+
+```
+
+```{r}
+##############################
+# END OF SCRIPT
+##############################
+cat("END OF SCRIPT!\n");
+```
+
+```{r results='asis'}
+#Print out session info
+sessionInfo()
+```
+
