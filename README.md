@@ -3,13 +3,13 @@
 This project repository contains R packages and scripts to generate results for the paper entitled
 "The landscape of antibody binding in SARS-CoV-2 infection"
 
-# Processing peptide arrays and muscle alignments
+# Processing peptide arrays and MUSCLE alignments
 
 Please see https://dholk.primate.wisc.edu/project/dho/sequencing/Polypeptide%20Microarrays/public/COVID_19/begin.view for data
-and instructions for preprocesing the peptide binding array data and muscle alignments.
+and instructions for preprocesing the peptide binding array data and MUSCLE (MUltiple Sequence Comparison by Log-Expectation) alignments for comparing each coronavirus to the Wu1-SARS2 sequence.
 
 
-# Finding Epitopes (For Figure 7)
+# Identifying Epitopes (Figure 7)
 
 Requirements:
 - R or RStudio
