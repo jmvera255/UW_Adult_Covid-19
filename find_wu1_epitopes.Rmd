@@ -61,7 +61,7 @@ library(UW.Adult.Covid.19);
 ##############################
 ```
 ```{r, parameters}
-stacked_df_path = "df_stacked.tsv";
+stacked_df_path = "df_stacked.tsv.gz";
 probe_meta_path = "all_sequences_except_wi.tsv.gz";
 
 padj_threshold = 0.1;
