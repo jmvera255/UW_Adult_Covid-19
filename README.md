@@ -8,6 +8,9 @@ This project repository contains R packages and scripts to generate results for 
 Please see https://dholk.primate.wisc.edu/project/dho/sequencing/Polypeptide%20Microarrays/public/COVID_19/begin.view for data
 and instructions for preprocesing the peptide binding array data and MUSCLE (MUltiple Sequence Comparison by Log-Expectation) alignments for comparing each coronavirus to the Wu1-SARS2 sequence.  To run the find_wu1_epitopes.Rmd script, you don't need to be able to run pepMeld, you can download the "aggregated_data/df_stacked.tsv.gz" and "all_sequences_except_wi.tsv.gz" from the above website and run the find_wu1_epitopes.Rmd mentioned below.  See find_wu1_epitopes.Rmd for details.
 
+# ELISA Array Correlation (Figure 6 data)
+
+Data for correlation in Figure 6 can be found here https://github.com/Ong-Research/UW_Adult_Covid-19/blob/main/04162021elisaarraycorrelationdata.xlsx.
 
 # Identifying Epitopes (Figure 7)
 
