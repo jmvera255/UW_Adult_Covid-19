@@ -26,7 +26,3 @@ Requirements:
 See find_wu1_epitopes.Rmd for other requirements.
 
 
-# Probe Heatmaps
-
-<Insert Instructions here for heatmap>
-
