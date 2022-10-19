@@ -343,6 +343,15 @@ findEpitopesTTestProbe<-function(ttest_result_probe, probe_meta, lfc.threshold, 
 }
 
 
+#' Title
+#'
+#' @param probe_mat
+#' @param epitopes_df
+#'
+#' @return
+#' @export
+#'
+#' @examples
 getEpitopeMat<-function(probe_mat, epitopes_df) {
 
   Epitope_Mat = NULL;
