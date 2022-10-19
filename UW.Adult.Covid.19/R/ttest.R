@@ -21,7 +21,7 @@ doTTest<-function(data_in, col1, col2, col3 = NA, label.col = "row.names", var.e
     }   else if (label.col %in% colnames(data_in)) {
       data_in$ID = data_in[,label.col];
     } else {
-      data_in$ID = 1:nrow(data);
+      data_in$ID = 1:nrow(data_in);
     }
   }
   if(length(unique(data_in$ID)) != nrow(data_in)) {
