@@ -1,8 +1,23 @@
+#' Title
+#'
+#' @param data_in
+#' @param col1
+#' @param col2
+#' @param col3
+#' @param label.col
+#' @param var.equal
+#' @param alternative
+#' @param debug
+#'
+#' @return
+#' @export
+#'
+#' @examples
 doTTest<-function(data_in, col1, col2, col3 = NA, label.col = "row.names", var.equal = TRUE, alternative="two.sided",debug=FALSE) {
 
   if (!("ID" %in% colnames(data_in))) {
     if (label.col == "row.names") {
-      data_in$ID = rownames(data_in);  
+      data_in$ID = rownames(data_in);
     }   else if (label.col %in% colnames(data_in)) {
       data_in$ID = data_in[,label.col];
     } else {
@@ -13,7 +28,7 @@ doTTest<-function(data_in, col1, col2, col3 = NA, label.col = "row.names", var.e
     stop("label.col ",label.col, " or ID is not a unique col!");
   }
 
-  group2=data.frame(data_in[,col2]);  
+  group2=data.frame(data_in[,col2]);
   group1=data.frame(data_in[,col1]);
   mean12        = rep(NA, nrow(data_in));
   mean1         = rep(NA, nrow(data_in));
@@ -32,7 +47,7 @@ doTTest<-function(data_in, col1, col2, col3 = NA, label.col = "row.names", var.e
   #group1/group2
   if (debug) {cat("iterating\n");}
   for (idx in 1:nrow(data_in)) {
-    
+
     group1_gene=as.numeric(na.omit(t(group1[idx,])));
     group2_gene=as.numeric(na.omit(t(group2[idx,])));
 
@@ -44,7 +59,7 @@ doTTest<-function(data_in, col1, col2, col3 = NA, label.col = "row.names", var.e
     current_mean12 = NA;
     current_mean1 = NA;
     current_mean2 = NA;
-    
+
     current_foldchange = NA;
     current_pvalue = NA;
     current_ttest_value = NA;
@@ -62,7 +77,7 @@ doTTest<-function(data_in, col1, col2, col3 = NA, label.col = "row.names", var.e
     if (n1 >= 1 && n2 >= 1 && (n1+n2) >= 3) {
       #print(group1_gene);
       #print(group2_gene);
-      
+
       temp=try(t.test(x=group1_gene, y=group2_gene, var.equal=var.equal, alternative=alternative));
       if ("try-error" %in% class(temp)) {
         current_foldchange = 0;
@@ -84,7 +99,7 @@ doTTest<-function(data_in, col1, col2, col3 = NA, label.col = "row.names", var.e
       }
     } else if (n1 >= 1 && n2 >= 1) {
       current_foldchange= (current_mean2 - current_mean1);
-    } 
+    }
     mean12[idx] = current_mean12;
     mean1[idx] = current_mean1;
     mean2[idx] = current_mean2;
@@ -92,7 +107,7 @@ doTTest<-function(data_in, col1, col2, col3 = NA, label.col = "row.names", var.e
     fold_changes[idx] = current_foldchange;
     pvalues[idx] = current_pvalue;
     npvalues[idx] = 1 - current_pvalue;
-    
+
     if (idx %% 100000 == 0) {
       cat("processed ", idx, " out of ",nrow(data_in), "\n");
     }
@@ -105,10 +120,10 @@ doTTest<-function(data_in, col1, col2, col3 = NA, label.col = "row.names", var.e
   library(multtest)
   res<-mt.rawp2adjp(pvalues,c("BH"),na.rm=TRUE);
   adjp=res$adjp[order(res$index),];
-  
+
   res<-mt.rawp2adjp(npvalues,c("BH"),na.rm=TRUE);
   adjnp=res$adjp[order(res$index),];
-  
+
   ans=data.frame(
     ID=data_in$ID,
     mean12 = mean12,

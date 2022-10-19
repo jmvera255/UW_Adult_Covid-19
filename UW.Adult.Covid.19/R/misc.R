@@ -1,4 +1,12 @@
 
+#' Title
+#'
+#' @param file_name
+#'
+#' @return
+#' @export
+#'
+#' @examples
 loadProbeMeta<-function(file_name="all_sequences_except_wi.tsv.gz") {
 
   probe_meta = read.table(file_name, sep="\t",header=TRUE);
@@ -8,6 +16,15 @@ loadProbeMeta<-function(file_name="all_sequences_except_wi.tsv.gz") {
 }
 
 
+#' Title
+#'
+#' @param file_name
+#' @param col_name
+#'
+#' @return
+#' @export
+#'
+#' @examples
 loadSeqMat<-function(file_name="df_stacked.tsv", col_name="INTENSITY") {
   IgG_stacked = read.table(file_name,sep="\t",header=TRUE);
   #cat("Generating ustack\n");
@@ -33,13 +50,13 @@ loadSeqMat<-function(file_name="df_stacked.tsv", col_name="INTENSITY") {
     colnames(sample_df)[ncol(sample_df)] = paste0("Sample_",sample_id);
   }
   rownames(sample_df) = sample_df$seq;
-  
+
   sample_meta = unique(IgG_stacked[,c("SAMPLE_NAME","COVID_POSITIVE")]);
   sample_meta$SAMPLE_NAME = paste0("Sample_",sample_meta$SAMPLE_NAME);
-  
+
   attr(sample_df, "sample_meta") = sample_meta
-  
-  
+
+
   return(sample_df);
 }
 
@@ -53,9 +70,9 @@ getProteinLabel<-function(probe.ids) {
       return(paste(x[1:n],sep=";",collapse=";"))
     }
   )
-  protein.labels = unlist(protein.list);  
+  protein.labels = unlist(protein.list);
   return(protein.labels);
-  
+
 }
 
 getProteinStart<-function(probe.ids) {
@@ -63,7 +80,7 @@ getProteinStart<-function(probe.ids) {
   protein.start.list = lapply(
     probe.list,
     function(x) {
-      
+
       return(x[length(x)]);
     }
   );
@@ -112,16 +129,34 @@ getEpitopeProbeIDs<-function(epitope_id) {
   protein = getEpitopeProtein(epitope_id);
   start = getEpitopeStart(epitope_id)
   stop = getEpitopeStop(epitope_id);
-  
+
   ans = paste0(protein,";",start:stop);
   return(ans);
 }
 
+#' Title
+#'
+#' @param protein
+#' @param start
+#' @param stop
+#'
+#' @return
+#' @export
+#'
+#' @examples
 getEpitopeID<-function(protein, start, stop) {
   return(paste(protein,start,stop, sep="_"))
 }
 
 
+#' Title
+#'
+#' @param in_mat
+#'
+#' @return
+#' @export
+#'
+#' @examples
 normalizeQuantile<-function(in_mat) {
   norm_mat = preprocessCore::normalize.quantiles(as.matrix(in_mat));
   norm_mat = as.data.frame(norm_mat);
@@ -137,21 +172,21 @@ getSequenceMatToProbeMat<-function(probe_meta, file_path) {
   } else {
     cat("Generating seq_to_probe\n")
     library(Matrix);
-    
+
     umeta = unique(probe_meta[,c("PROBE_ID","PROBE_SEQUENCE")])
-    
-    
+
+
     uniq_seq = unique(umeta$PROBE_SEQUENCE);
     probe_idx = 1:nrow(umeta);
     seq_idx = 1:length(uniq_seq)
     names(seq_idx) = uniq_seq;
-    
+
     seq_idx2 = seq_idx[umeta$PROBE_SEQUENCE]
-    
+
     seq_to_probe = sparseMatrix(probe_idx, seq_idx2, x =1);
     rownames(seq_to_probe) = umeta$PROBE_ID;
     colnames(seq_to_probe) = uniq_seq;
-  
+
     if (!missing(file_path)) {
       cat("Saving to ",file_path,"\n");
       save(list=c("seq_to_probe"), file=file_path)
@@ -162,8 +197,18 @@ getSequenceMatToProbeMat<-function(probe_meta, file_path) {
 
 
 
+#' Title
+#'
+#' @param seq_mat
+#' @param probe_meta
+#' @param file_path
+#'
+#' @return
+#' @export
+#'
+#' @examples
 convertSequenceMatToProbeMat<-function(seq_mat, probe_meta, file_path) {
-  library(Matrix); 
+  library(Matrix);
   seq_to_probe = getSequenceMatToProbeMat(probe_meta, file_path);
   probe_mat = as.matrix(seq_to_probe[,rownames(seq_mat)] %*% as.matrix(seq_mat));
   return(probe_mat)

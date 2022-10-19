@@ -1,20 +1,20 @@
 
 getMetricStats<-function(blocks, probes, metric, label, proteins=getProteinLabel(probes), pos = getProteinStart(probes)) {
 
-  cat("getMetricStats - start\n");  
+  cat("getMetricStats - start\n");
   min_value = rep(NA, nrow(blocks))
   max_value = rep(NA, nrow(blocks))
   mean_value = rep(NA, nrow(blocks))
-  
-  
-  
+
+
+
   for (idx in 1:nrow(blocks)) {
     metric_values = metric[proteins == blocks$Protein[idx] & pos >= blocks$Start[idx] & pos <= blocks$Stop[idx]];
     min_value[idx] = min(metric_values, na.rm=TRUE);
     max_value[idx] = max(metric_values, na.rm=TRUE);
-    mean_value[idx] = mean(metric_values, na.rm=TRUE);    
+    mean_value[idx] = mean(metric_values, na.rm=TRUE);
   }
-  
+
   ans = data.frame(
     min_value = min_value,
     max_value = max_value,
@@ -30,13 +30,13 @@ getMetricStats<-function(blocks, probes, metric, label, proteins=getProteinLabel
 
 
 addSequenceAnnotations<-function(blocks_df, probe_meta) {
-  
+
   ans_df = blocks_df
   umeta = unique(probe_meta[,c("PROBE_ID","PROBE_SEQUENCE")]);
   rownames(umeta) = umeta$PROBE_ID;
-  
-    
-  
+
+
+
   first_probe = paste0(ans_df$Protein,";",ans_df$Start);
   last_probe = paste0(ans_df$Protein,";",ans_df$Stop);
   ans_df$First.Sequence = umeta[first_probe,"PROBE_SEQUENCE"];
@@ -49,14 +49,14 @@ addSequenceAnnotations<-function(blocks_df, probe_meta) {
     stop = nchar(ans_df$First.Sequence[idx])
     ans_df$Overlap.Sequence[idx] = substr(ans_df$First.Sequence[idx], start, stop);
     probes = paste0(ans_df$Protein[idx], ";",ans_df$Start[idx]:ans_df$Stop[idx]);
-    
+
       if (nprobes[idx] == 1) { #If just one probe, full sequence is just the probe.
         ans_df$Full.Sequence[idx] = ans_df$First.Sequence[idx];
       } else {
         #If first and last sequence overlap, then just cat those two.  Else, stitch the whole thing together.
         if (start <= stop) {
           ans_df$Full.Sequence[idx] = catSequences(c(ans_df$Start[idx], ans_df$Stop[idx]),c(ans_df$First.Sequence[idx],ans_df$Last.Sequence[idx]))
-        } else {      
+        } else {
           ans_df$Full.Sequence[idx] = catSequences(ans_df$Start[idx]:ans_df$Stop[idx],umeta[probes,"PROBE_SEQUENCE"]);
         }
       }
@@ -68,8 +68,16 @@ addSequenceAnnotations<-function(blocks_df, probe_meta) {
 }
 
 
+#' Title
+#'
+#' @param protein.df
+#'
+#' @return
+#' @export
+#'
+#' @examples
 findBlocks<-function(protein.df) {
-  
+
   if (nrow(protein.df)  == 1) {
     return(
       data.frame(
@@ -89,7 +97,7 @@ findBlocks<-function(protein.df) {
       )
     );
   }
-  
+
   protein.df = protein.df[order(protein.df$Pos, decreasing=FALSE),];
   ans.df = NULL;
   start_idx=1;
@@ -100,7 +108,7 @@ findBlocks<-function(protein.df) {
     prev_idx = idx-1;
     prev_pos = protein.df$Pos[prev_idx];
     d = current_pos - prev_pos;
-    
+
     if (d > 1) {
       #Block is start_pos to prev_pos
       #cat("Add ",start_idx," ",prev_idx,"\n");
@@ -156,11 +164,31 @@ findBlocks<-function(protein.df) {
         stringsAsFactors = FALSE
       )
     )
+  } else { # Last probe is by itself
+     ans.df = rbind(
+         ans.df,
+         data.frame(
+             Protein=protein.df$Protein[1],
+             Start = protein.df$Pos[nrow(protein.df)],
+             Stop = protein.df$Pos[nrow(protein.df)],
+             Min.Pvalue = protein.df$Pvalue[nrow(protein.df)],
+             Max.Pvalue = protein.df$Pvalue[nrow(protein.df)],
+             Mean.Pvalue = protein.df$Pvalue[nrow(protein.df)],
+             Min.logFC = protein.df$logFC[nrow(protein.df)],
+             Max.logFC = protein.df$logFC[nrow(protein.df)],
+             Mean.logFC = protein.df$logFC[nrow(protein.df)],
+             Min.Signal = protein.df$Mean.Signal[nrow(protein.df)],
+             Max.Signal = protein.df$Mean.Signal[nrow(protein.df)],
+             Mean.Signal = protein.df$Mean.Signal[nrow(protein.df)],
+             stringsAsFactors = FALSE
+
+         )
+     )
   }
-  
-  
+
+
   return(ans.df);
-  
+
 }
 
 catSequences<-function(positions, sequences,debug=FALSE) {
@@ -169,27 +197,27 @@ catSequences<-function(positions, sequences,debug=FALSE) {
     return(sequences);
   }
   positions = positions-positions[1]+1;
-  
+
   seq = rep("",1000);
   for (idx in 1:length(positions)) {
     pos = positions[idx];
     aa_vec = strsplit(sequences[idx],"")[[1]]
     startp = pos;
     endp = pos + length(aa_vec) - 1
-    seq[startp:endp] = aa_vec;    
+    seq[startp:endp] = aa_vec;
   }
-  
+
   seq = seq[seq!=""]
   seqc = paste0(seq, collapse="",sep="");
   return(seqc);
 }
 
 findEpitopes<-function(probes, logfc, pvalues, mean.signal, probe_meta, lfc.threshold = 0, pvalue.threshold = 0.05, two.sided = FALSE) {
-  
-  
+
+
   sig = pvalues < pvalue.threshold & logfc > lfc.threshold
-  
-  
+
+
   protein.df = data.frame(
     Probe = probes[sig],
     Protein = getProteinLabel(probes[sig]),
@@ -199,21 +227,21 @@ findEpitopes<-function(probes, logfc, pvalues, mean.signal, probe_meta, lfc.thre
     Mean.Signal = mean.signal[sig],
     stringsAsFactors=FALSE
   );
-  
+
   protein_list = split(protein.df, protein.df$Protein);
   #print(names(protein_list))
   ans_list = lapply(protein_list, findBlocks)
-  
+
   ans_dt = data.table::rbindlist(ans_list);
   ans_df = as.data.frame(ans_dt, stringsAsFactors=FALSE);
-  
+
   if (!missing(probe_meta)) {
-  
+
     umeta = unique(probe_meta[,c("PROBE_ID","PROBE_SEQUENCE")]);
     rownames(umeta) = umeta$PROBE_ID;
-  
-    
-  
+
+
+
     first_probe = paste0(ans_df$Protein,";",ans_df$Start);
     last_probe = paste0(ans_df$Protein,";",ans_df$Stop);
     ans_df$First.Sequence = umeta[first_probe,"PROBE_SEQUENCE"];
@@ -221,20 +249,20 @@ findEpitopes<-function(probes, logfc, pvalues, mean.signal, probe_meta, lfc.thre
     ans_df$Overlap.Sequence = NA;
     ans_df$Full.Sequence = NA;
     nprobes = ans_df$Stop - ans_df$Start + 1;
-    
+
     for (idx in 1:nrow(ans_df)) {
       start = nprobes[idx];
       stop = nchar(ans_df$First.Sequence[idx])
       ans_df$Overlap.Sequence[idx] = substr(ans_df$First.Sequence[idx], start, stop);
       probes = paste0(ans_df$Protein[idx], ";",ans_df$Start[idx]:ans_df$Stop[idx]);
-      
+
       if (nprobes[idx] == 1) { #If just one probe, full sequence is just the probe.
         ans_df$Full.Sequence[idx] = ans_df$First.Sequence[idx];
       } else {
         #If first and last sequence overlap, then just cat those two.  Else, stitch the whole thing together.
         if (start <= stop) {
           ans_df$Full.Sequence[idx] = catSequences(c(ans_df$Start[idx], ans_df$Stop[idx]),c(ans_df$First.Sequence[idx],ans_df$Last.Sequence[idx]))
-        } else {      
+        } else {
           ans_df$Full.Sequence[idx] = catSequences(ans_df$Start[idx]:ans_df$Stop[idx],umeta[probes,"PROBE_SEQUENCE"]);
         }
       }
@@ -244,7 +272,7 @@ findEpitopes<-function(probes, logfc, pvalues, mean.signal, probe_meta, lfc.thre
     }
 
   }
-  
+
   if (two.sided) {
     cat("Getting other side\n");
     ans_df_2 = findEpitopes(
@@ -268,8 +296,8 @@ findEpitopes<-function(probes, logfc, pvalues, mean.signal, probe_meta, lfc.thre
     ans_df = ans_df[order(ans_df$Min.Pvalue),]
   }
   attr(ans_df,"protein.df") = protein.df;
-  
-  
+
+
   return(ans_df);
 }
 
@@ -290,6 +318,17 @@ getEpitopeSequence<-function(protein, start, stop, probe_meta, umeta = unique(pr
 }
 
 
+#' Title
+#'
+#' @param ttest_result_probe
+#' @param probe_meta
+#' @param lfc.threshold
+#' @param pvalue.threshold
+#'
+#' @return
+#' @export
+#'
+#' @examples
 findEpitopesTTestProbe<-function(ttest_result_probe, probe_meta, lfc.threshold, pvalue.threshold) {
   ans = findEpitopes(
     rownames(ttest_result_probe),
@@ -300,7 +339,7 @@ findEpitopesTTestProbe<-function(ttest_result_probe, probe_meta, lfc.threshold, 
     pvalue.threshold = pvalue.threshold,
     probe_meta = probe_meta
   );
-  
+
 }
 
 
@@ -328,8 +367,8 @@ getEpitopeMat<-function(probe_mat, epitopes_df) {
   Epitope_Mat_dt = rbindlist(Epitope_Mat_list);
   Epitope_Mat = as.data.frame(Epitope_Mat_dt, stringsAsFactors=FALSE);
   rownames(Epitope_Mat) = names(Epitope_Mat_list);
-  
+
   return (Epitope_Mat);
-  
+
 }
 

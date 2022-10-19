@@ -1,6 +1,6 @@
 Package: UW.Adult.Covid.19
 Title: Provides means to generate epitopes from peptide binding array data from NimbleTherapeutics.
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Authors@R: 
     person(given = "Sean",
            family = "McIlwain",
@@ -16,7 +16,7 @@ Imports:
 	data.table
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.1
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
