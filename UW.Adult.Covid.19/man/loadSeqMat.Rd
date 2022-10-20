@@ -2,13 +2,15 @@
 % Please edit documentation in R/misc.R
 \name{loadSeqMat}
 \alias{loadSeqMat}
-\title{Title}
+\title{Load the sequence matrix}
 \usage{
 loadSeqMat(file_name = "df_stacked.tsv", col_name = "INTENSITY")
 }
 \arguments{
-\item{col_name}{}
+\item{file_name}{input filename}
+
+\item{col_name}{signal column to use (Default INTENSITY)}
 }
 \description{
-Title
+Load the sequence matrix
 }

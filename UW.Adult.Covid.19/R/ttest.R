@@ -1,18 +1,17 @@
 #' Title
 #'
-#' @param data_in
-#' @param col1
-#' @param col2
-#' @param col3
-#' @param label.col
-#' @param var.equal
-#' @param alternative
-#' @param debug
+#' @param data_in input data.frame
+#' @param col1 vector of column names for 1st condition
+#' @param col2 vector of column names for 2nd condition
+#' @param col3 not used
+#' @param label.col which column to use for rows
+#' @param var.equal var.equal parameter for t.test call
+#' @param alternative alternative parameter for t.test call
+#' @param debug print debugging information
 #'
-#' @return
+#' @return data.frame of results
 #' @export
 #'
-#' @examples
 doTTest<-function(data_in, col1, col2, col3 = NA, label.col = "row.names", var.equal = TRUE, alternative="two.sided",debug=FALSE) {
 
   if (!("ID" %in% colnames(data_in))) {
@@ -48,8 +47,8 @@ doTTest<-function(data_in, col1, col2, col3 = NA, label.col = "row.names", var.e
   if (debug) {cat("iterating\n");}
   for (idx in 1:nrow(data_in)) {
 
-    group1_gene=as.numeric(na.omit(t(group1[idx,])));
-    group2_gene=as.numeric(na.omit(t(group2[idx,])));
+    group1_gene=as.numeric(stats::na.omit(t(group1[idx,])));
+    group2_gene=as.numeric(stats::na.omit(t(group2[idx,])));
 
     n1=length(group1_gene);
     n2=length(group2_gene);
@@ -78,7 +77,7 @@ doTTest<-function(data_in, col1, col2, col3 = NA, label.col = "row.names", var.e
       #print(group1_gene);
       #print(group2_gene);
 
-      temp=try(t.test(x=group1_gene, y=group2_gene, var.equal=var.equal, alternative=alternative));
+      temp=try(stats::t.test(x=group1_gene, y=group2_gene, var.equal=var.equal, alternative=alternative));
       if ("try-error" %in% class(temp)) {
         current_foldchange = 0;
         current_pvalue = 1;
@@ -118,7 +117,7 @@ doTTest<-function(data_in, col1, col2, col3 = NA, label.col = "row.names", var.e
   #biocLite("multtest")
   #
   library(multtest)
-  res<-mt.rawp2adjp(pvalues,c("BH"),na.rm=TRUE);
+  res<-multtest::mt.rawp2adjp(pvalues,c("BH"),na.rm=TRUE);
   adjp=res$adjp[order(res$index),];
 
   res<-mt.rawp2adjp(npvalues,c("BH"),na.rm=TRUE);

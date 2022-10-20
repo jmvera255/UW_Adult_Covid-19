@@ -1,5 +1,5 @@
 Package: UW.Adult.Covid.19
-Title: Provides means to generate epitopes from peptide binding array data from NimbleTherapeutics.
+Title: Provides means to generate epitopes from peptide binding array data from NimbleTherapeutics
 Version: 0.0.0.9001
 Authors@R: 
     person(given = "Sean",

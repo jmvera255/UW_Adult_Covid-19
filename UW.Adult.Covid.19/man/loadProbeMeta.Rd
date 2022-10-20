@@ -2,13 +2,16 @@
 % Please edit documentation in R/misc.R
 \name{loadProbeMeta}
 \alias{loadProbeMeta}
-\title{Title}
+\title{Load the probe metadata}
 \usage{
 loadProbeMeta(file_name = "all_sequences_except_wi.tsv.gz")
 }
 \arguments{
-\item{file_name}{}
+\item{file_name}{input filename}
+}
+\value{
+data.frame of meta data from probes
 }
 \description{
-Title
+Load the probe metadata
 }

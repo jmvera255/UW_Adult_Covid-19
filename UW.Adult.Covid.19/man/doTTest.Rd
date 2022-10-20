@@ -16,7 +16,24 @@ doTTest(
 )
 }
 \arguments{
-\item{debug}{}
+\item{data_in}{input data.frame}
+
+\item{col1}{vector of column names for 1st condition}
+
+\item{col2}{vector of column names for 2nd condition}
+
+\item{col3}{not used}
+
+\item{label.col}{which column to use for rows}
+
+\item{var.equal}{var.equal parameter for t.test call}
+
+\item{alternative}{alternative parameter for t.test call}
+
+\item{debug}{print debugging information}
+}
+\value{
+data.frame of results
 }
 \description{
 Title

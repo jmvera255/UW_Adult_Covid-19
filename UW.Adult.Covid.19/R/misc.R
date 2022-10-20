@@ -1,12 +1,11 @@
 
-#' Title
+#' Load the probe metadata
 #'
-#' @param file_name
+#' @param file_name input filename
 #'
-#' @return
+#' @return data.frame of meta data from probes
 #' @export
 #'
-#' @examples
 loadProbeMeta<-function(file_name="all_sequences_except_wi.tsv.gz") {
 
   probe_meta = read.table(file_name, sep="\t",header=TRUE);
@@ -16,15 +15,14 @@ loadProbeMeta<-function(file_name="all_sequences_except_wi.tsv.gz") {
 }
 
 
-#' Title
+#' Load the sequence matrix
 #'
-#' @param file_name
-#' @param col_name
+#' @param file_name input filename
+#' @param col_name signal column to use (Default INTENSITY)
 #'
 #' @return
 #' @export
 #'
-#' @examples
 loadSeqMat<-function(file_name="df_stacked.tsv", col_name="INTENSITY") {
   IgG_stacked = read.table(file_name,sep="\t",header=TRUE);
   #cat("Generating ustack\n");
@@ -134,16 +132,17 @@ getEpitopeProbeIDs<-function(epitope_id) {
   return(ans);
 }
 
-#' Title
+#' Make Epitope Id
 #'
-#' @param protein
-#' @param start
-#' @param stop
+#' @param protein protein of the epitope
+#' @param start first probe start position
+#' @param stop last probe start position
 #'
-#' @return
+#' @return epitope identifer string
 #' @export
 #'
 #' @examples
+#' getEpitopeID("A", 1, 3)
 getEpitopeID<-function(protein, start, stop) {
   return(paste(protein,start,stop, sep="_"))
 }

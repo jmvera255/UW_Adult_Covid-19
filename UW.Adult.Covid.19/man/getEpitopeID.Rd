@@ -2,13 +2,23 @@
 % Please edit documentation in R/misc.R
 \name{getEpitopeID}
 \alias{getEpitopeID}
-\title{Title}
+\title{Make Epitope Id}
 \usage{
 getEpitopeID(protein, start, stop)
 }
 \arguments{
-\item{stop}{}
+\item{protein}{protein of the epitope}
+
+\item{start}{first probe start position}
+
+\item{stop}{last probe start position}
+}
+\value{
+epitope identifer string
 }
 \description{
-Title
+Make Epitope Id
+}
+\examples{
+getEpitopeID("A", 1, 3)
 }
