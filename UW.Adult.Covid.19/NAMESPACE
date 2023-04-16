@@ -3,6 +3,7 @@
 export(convertSequenceMatToProbeMat)
 export(doTTest)
 export(findBlocks)
+export(findEpitopes)
 export(findEpitopesTTestProbe)
 export(getEpitopeID)
 export(getEpitopeMat)

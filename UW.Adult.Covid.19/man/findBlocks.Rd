@@ -2,7 +2,7 @@
 % Please edit documentation in R/epitope.R
 \name{findBlocks}
 \alias{findBlocks}
-\title{Title}
+\title{find epitope blocks}
 \usage{
 findBlocks(protein.df)
 }
@@ -10,5 +10,5 @@ findBlocks(protein.df)
 \item{protein.df}{}
 }
 \description{
-Title
+find epitope blocks
 }

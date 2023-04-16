@@ -68,7 +68,7 @@ addSequenceAnnotations<-function(blocks_df, probe_meta) {
 }
 
 
-#' Title
+#' find epitope blocks
 #'
 #' @param protein.df
 #'
@@ -212,6 +212,21 @@ catSequences<-function(positions, sequences,debug=FALSE) {
   return(seqc);
 }
 
+#' find epitopes using t-test statistics
+#'
+#' @param probes
+#' @param logfc
+#' @param pvalues
+#' @param mean.signal
+#' @param probe_meta
+#' @param lfc.threshold
+#' @param pvalue.threshold
+#' @param two.sided
+#'
+#' @return
+#' @export
+#'
+#' @examples
 findEpitopes<-function(probes, logfc, pvalues, mean.signal, probe_meta, lfc.threshold = 0, pvalue.threshold = 0.05, two.sided = FALSE) {
 
 
