@@ -94,7 +94,7 @@ doTTest<-function(data_in, col1, col2, col3 = NA, label.col = "row.names", var.e
         current_mean2 = mean(group2_gene);
         current_ttest_value = -temp$statistic;
         if (is_paired) {
-          current_foldchange <- temp$estimate[1] # mean of the differences
+          current_foldchange <- -1*temp$estimate[1] # mean of the differences
         } else {
           current_foldchange = as.numeric(temp$estimate[2]-temp$estimate[1]);
         }
@@ -109,7 +109,7 @@ doTTest<-function(data_in, col1, col2, col3 = NA, label.col = "row.names", var.e
       }
     } else if (n1 >= 1 && n2 >= 1) {
       if (is_paired) {
-        current_foldchange <- temp$estimate[1] # mean of the differences
+        current_foldchange <- -1*temp$estimate[1] # mean of the differences
       } else {
         current_foldchange= (current_mean2 - current_mean1);
       }
